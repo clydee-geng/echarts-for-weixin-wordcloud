@@ -1,10 +1,10 @@
 <view style="width:100%;height: 300px;">
-  <ec-canvas canvas-id="demo1" id="demo1" ec="{{ ec }}"></ec-canvas>
+  <ec-canvas canvas-id="demo1" ec="{{ demo1 }}"></ec-canvas>
 </view>
 <view style="width:100%;height: 300px;">
-  <ec-canvas canvas-id="demo2" id="demo2" ec="{{ maskImgEc }}"></ec-canvas>
+  <ec-canvas canvas-id="demo2" ec="{{ demo2 }}"></ec-canvas>
 </view>
-
 <view style="width:100%;height: 300px;">
-  <ec-canvas canvas-id="demo3" id="demo3" ec="{{ maskImgEc }}"></ec-canvas>
+  <ec-canvas canvas-id="demo3" ec="{{ demo3 }}"></ec-canvas>
 </view>
+<image src="./logo.png"></image>

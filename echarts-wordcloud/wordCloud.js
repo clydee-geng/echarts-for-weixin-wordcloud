@@ -57,117 +57,127 @@ export default function ({ createCanvas }) {
 
   echarts.registerLayout(function (ecModel, api) {
     ecModel.eachSeriesByType("wordCloud", function (seriesModel) {
-      var gridRect = echarts.helper.getLayoutRect(
-        seriesModel.getBoxLayoutParams(),
-        {
-          width: api.getWidth(),
-          height: api.getHeight(),
+      function callback(canvas, maskImage) {
+        var gridRect = echarts.helper.getLayoutRect(
+          seriesModel.getBoxLayoutParams(),
+          {
+            width: api.getWidth(),
+            height: api.getHeight(),
+          }
+        );
+
+        var keepAspect = seriesModel.get("keepAspect");
+        var ratio = maskImage ? maskImage.width / maskImage.height : 1;
+        keepAspect && adjustRectAspect(gridRect, ratio);
+
+        var data = seriesModel.getData();
+
+        canvas.width = gridRect.width;
+        canvas.height = gridRect.height;
+
+        var ctx = canvas.getContext("2d");
+        if (maskImage) {
+          try {
+            ctx.drawImage(maskImage, 0, 0, canvas.width, canvas.height);
+            var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            updateCanvasMask(canvas);
+          } catch (e) {
+            console.error("Invalid mask image");
+            console.error(e.toString());
+          }
         }
-      );
 
-      var keepAspect = seriesModel.get("keepAspect");
-      var maskImage = seriesModel.get("maskImage");
-      var ratio = maskImage ? maskImage.width / maskImage.height : 1;
-      keepAspect && adjustRectAspect(gridRect, ratio);
+        var sizeRange = seriesModel.get("sizeRange");
+        var rotationRange = seriesModel.get("rotationRange");
+        var valueExtent = data.getDataExtent("value");
 
-      var data = seriesModel.getData();
+        var DEGREE_TO_RAD = Math.PI / 180;
+        var gridSize = seriesModel.get("gridSize");
+        extendEvent(canvas);
+        wordCloudLayoutHelper(canvas, {
+          list: data
+            .mapArray("value", function (value, idx) {
+              var itemModel = data.getItemModel(idx);
+              return [
+                data.getName(idx),
+                itemModel.get("textStyle.fontSize", true) ||
+                  echarts.number.linearMap(value, valueExtent, sizeRange),
+                idx,
+              ];
+            })
+            .sort(function (a, b) {
+              // Sort from large to small in case there is no more room for more words
+              return b[1] - a[1];
+            }),
+          fontFamily:
+            seriesModel.get("textStyle.fontFamily") ||
+            seriesModel.get("emphasis.textStyle.fontFamily") ||
+            ecModel.get("textStyle.fontFamily"),
+          fontWeight:
+            seriesModel.get("textStyle.fontWeight") ||
+            seriesModel.get("emphasis.textStyle.fontWeight") ||
+            ecModel.get("textStyle.fontWeight"),
 
+          gridSize: gridSize,
+
+          ellipticity: gridRect.height / gridRect.width,
+
+          minRotation: rotationRange[0] * DEGREE_TO_RAD,
+          maxRotation: rotationRange[1] * DEGREE_TO_RAD,
+
+          clearCanvas: !maskImage,
+
+          rotateRatio: 1,
+
+          rotationStep: seriesModel.get("rotationStep") * DEGREE_TO_RAD,
+
+          drawOutOfBound: seriesModel.get("drawOutOfBound"),
+          shrinkToFit: seriesModel.get("shrinkToFit"),
+
+          wait: seriesModel.get("wait") || 0,
+
+          shuffle: false,
+
+          shape: seriesModel.get("shape"),
+        });
+        function onWordCloudDrawn(e) {
+          var item = e.detail.item;
+          if (e.detail.drawn && seriesModel.layoutInstance.ondraw) {
+            e.detail.drawn.gx += gridRect.x / gridSize;
+            e.detail.drawn.gy += gridRect.y / gridSize;
+            seriesModel.layoutInstance.ondraw(
+              item[0],
+              item[1],
+              item[2],
+              e.detail.drawn
+            );
+          }
+        }
+        canvas.$on("wordclouddrawn", onWordCloudDrawn);
+
+        // if (seriesModel.layoutInstance) {
+        //   seriesModel.layoutInstance.dispose();
+        // }
+
+        // seriesModel.layoutInstance = {
+        //   ondraw: null,
+        //   dispose: function () {
+        //     canvas.$remove("wordclouddrawn");
+        //   },
+        // };
+      }
+
+      var maskImageUrl = seriesModel.get("maskImageUrl");
       var canvas = createCanvas();
-      canvas.width = gridRect.width;
-      canvas.height = gridRect.height;
-
-      var ctx = canvas.getContext("2d");
-      if (maskImage) {
-        try {
-          ctx.drawImage(maskImage, 0, 0, canvas.width, canvas.height);
-          updateCanvasMask(canvas);
-        } catch (e) {
-          console.error("Invalid mask image");
-          console.error(e.toString());
-        }
+      if (maskImageUrl) {
+        var maskImage = canvas.createImage();
+        maskImage.onload = function () {
+          callback(canvas, maskImage);
+        };
+        maskImage.src = maskImageUrl;
+      }else{
+        callback(canvas);
       }
-
-      var sizeRange = seriesModel.get("sizeRange");
-      var rotationRange = seriesModel.get("rotationRange");
-      var valueExtent = data.getDataExtent("value");
-
-      var DEGREE_TO_RAD = Math.PI / 180;
-      var gridSize = seriesModel.get("gridSize");
-      extendEvent(canvas);
-      wordCloudLayoutHelper(canvas, {
-        list: data
-          .mapArray("value", function (value, idx) {
-            var itemModel = data.getItemModel(idx);
-            return [
-              data.getName(idx),
-              itemModel.get("textStyle.fontSize", true) ||
-                echarts.number.linearMap(value, valueExtent, sizeRange),
-              idx,
-            ];
-          })
-          .sort(function (a, b) {
-            // Sort from large to small in case there is no more room for more words
-            return b[1] - a[1];
-          }),
-        fontFamily:
-          seriesModel.get("textStyle.fontFamily") ||
-          seriesModel.get("emphasis.textStyle.fontFamily") ||
-          ecModel.get("textStyle.fontFamily"),
-        fontWeight:
-          seriesModel.get("textStyle.fontWeight") ||
-          seriesModel.get("emphasis.textStyle.fontWeight") ||
-          ecModel.get("textStyle.fontWeight"),
-
-        gridSize: gridSize,
-
-        ellipticity: gridRect.height / gridRect.width,
-
-        minRotation: rotationRange[0] * DEGREE_TO_RAD,
-        maxRotation: rotationRange[1] * DEGREE_TO_RAD,
-
-        clearCanvas: !maskImage,
-
-        rotateRatio: 1,
-
-        rotationStep: seriesModel.get("rotationStep") * DEGREE_TO_RAD,
-
-        drawOutOfBound: seriesModel.get("drawOutOfBound"),
-        shrinkToFit: seriesModel.get("shrinkToFit"),
-
-        wait: seriesModel.get("wait") || 0,
-
-        shuffle: false,
-
-        shape: seriesModel.get("shape"),
-      });
-      function onWordCloudDrawn(e) {
-        var item = e.detail.item;
-        if (e.detail.drawn && seriesModel.layoutInstance.ondraw) {
-          e.detail.drawn.gx += gridRect.x / gridSize;
-          e.detail.drawn.gy += gridRect.y / gridSize;
-          seriesModel.layoutInstance.ondraw(
-            item[0],
-            item[1],
-            item[2],
-            e.detail.drawn
-          );
-        }
-      }
-
-      console.log('xxxx ===>', canvas)
-
-      canvas.$on("wordclouddrawn", onWordCloudDrawn);
-
-      if (seriesModel.layoutInstance) {
-        seriesModel.layoutInstance.dispose();
-      }
-
-      seriesModel.layoutInstance = {
-        ondraw: null,
-        dispose: function () {
-          canvas.$remove("wordclouddrawn");
-        },
-      };
     });
   });
 

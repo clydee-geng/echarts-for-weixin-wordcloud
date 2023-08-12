@@ -3,5 +3,7 @@
     "projectname": "echarts-word-cloud-for-wx",
     "setting": {
         "compileHotReLoad": true
-    }
+    },
+    "libVersion": "2.33.0",
+    "condition": {}
 }

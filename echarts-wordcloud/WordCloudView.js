@@ -11,6 +11,7 @@ echarts.extendChartView({
 
     var gridSize = seriesModel.get('gridSize');
 
+    seriesModel.layoutInstance || (seriesModel.layoutInstance = {})
     seriesModel.layoutInstance.ondraw = function (text, size, dataIdx, drawn) {
       var itemModel = data.getItemModel(dataIdx);
       var textStyleModel = itemModel.getModel('textStyle');
