@@ -22,9 +22,7 @@ wordCloud({
 
 ```
 3.在page中使用(具体可查看pages/demo，和官方的echarts-wordcloud使用方法一样)
-4.效果
 
-
-
-
+4.demo效果
+![avatar](https://github.com/clydee-geng/echarts-for-weixin-wordcloud/blob/main/%E6%95%88%E6%9E%9C.gif?raw=true)
 
