@@ -155,16 +155,19 @@ export default function ({ createCanvas }) {
         }
         canvas.$on("wordclouddrawn", onWordCloudDrawn);
 
-        // if (seriesModel.layoutInstance) {
-        //   seriesModel.layoutInstance.dispose();
-        // }
+        if (seriesModel.layoutInstance && typeof seriesModel.layoutInstance.dispose === 'function') {
+          seriesModel.layoutInstance.dispose();
+        }
 
-        // seriesModel.layoutInstance = {
-        //   ondraw: null,
-        //   dispose: function () {
-        //     canvas.$remove("wordclouddrawn");
-        //   },
-        // };
+        seriesModel.layoutInstance = {
+          ondraw: seriesModel.layoutInstance ? seriesModel.layoutInstance.ondraw? seriesModel.layoutInstance.ondraw:null: null,
+          dispose: function () {
+            canvas.$remove("wordclouddrawn");
+          },
+        };
+
+        console.log('赋值', seriesModel)
+
       }
 
       var maskImageUrl = seriesModel.get("maskImageUrl");

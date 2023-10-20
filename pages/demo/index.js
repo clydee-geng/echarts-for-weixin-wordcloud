@@ -378,7 +378,7 @@ Page({
               rotationRange: [0, 0],
               gridSize: 0,
               shape: "pentagon",
-              maskImageUrl: '/pages/demo/logo.png',
+              maskImageUrl: "/pages/demo/logo.png",
               drawOutOfBound: false,
               // layoutAnimation: true, 去掉layoutAnimation，直接用wait代替
               wait: 1000,
@@ -409,6 +409,7 @@ Page({
           ],
         };
 
+        chart.clear();
         chart.setOption(option);
         return chart;
       },
@@ -550,6 +551,7 @@ Page({
           ],
         };
 
+        chart.clear();
         chart.setOption(option);
         return chart;
       },
@@ -629,6 +631,150 @@ Page({
           devicePixelRatio: dpr, // 像素
         });
         canvas.setChart(chart);
+        chart.setOption(option);
+        return chart;
+      },
+    },
+    demo4: {
+      onInit: (canvas, width, height, dpr) => {
+        const chart = echarts.init(canvas, null, {
+          width: width,
+          height: height,
+          devicePixelRatio: dpr, // 像素
+        });
+        canvas.setChart(chart);
+
+        var option = {
+          tooltip: {
+            confine: true,
+          },
+          series: [
+            {
+              type: "wordCloud",
+              gridSize: 2,
+              sizeRange: [12, 50],
+              rotationRange: [0, 90],
+              //渲染的梯度就是 rotationStep ，这个值越小，词云里出现的角度种类就越多
+              rotationStep: 90,
+              shape: "circle",
+              // width: 375,
+              // height: 200,
+              drawOutOfBound: true,
+              textStyle: {
+                color: function () {
+                  return (
+                    "rgb(" +
+                    [
+                      Math.round(Math.random() * 160),
+                      Math.round(Math.random() * 160),
+                      Math.round(Math.random() * 160),
+                    ].join(",") +
+                    ")"
+                  );
+                },
+              },
+              emphasis: {
+                textStyle: {
+                  shadowBlur: 10,
+                  shadowColor: "#333",
+                },
+              },
+              data: [
+                {
+                  name: "Sam S Club",
+                  value: 10000,
+                  textStyle: {
+                    color: "black",
+                  },
+                  emphasis: {
+                    textStyle: {
+                      color: "red",
+                    },
+                  },
+                },
+                {
+                  name: "Macys",
+                  value: 6181,
+                },
+                {
+                  name: "Amy Schumer",
+                  value: 4386,
+                },
+                {
+                  name: "Jurassic World",
+                  value: 4055,
+                },
+                {
+                  name: "Charter Communications",
+                  value: 2467,
+                },
+                {
+                  name: "Chick Fil A",
+                  value: 2244,
+                },
+                {
+                  name: "Planet Fitness",
+                  value: 1898,
+                },
+                {
+                  name: "Pitch Perfect",
+                  value: 1484,
+                },
+                {
+                  name: "Express",
+                  value: 1112,
+                },
+                {
+                  name: "Home",
+                  value: 965,
+                },
+                {
+                  name: "Johnny Depp",
+                  value: 847,
+                },
+                {
+                  name: "Lena Dunham",
+                  value: 582,
+                },
+                {
+                  name: "Lewis Hamilton",
+                  value: 555,
+                },
+                {
+                  name: "KXAN",
+                  value: 550,
+                },
+                {
+                  name: "Mary Ellen Mark",
+                  value: 462,
+                },
+                {
+                  name: "Farrah Abraham",
+                  value: 366,
+                },
+                {
+                  name: "Rita Ora",
+                  value: 360,
+                },
+                {
+                  name: "Serena Williams",
+                  value: 282,
+                },
+                {
+                  name: "NCAA baseball tournament",
+                  value: 273,
+                },
+                {
+                  name: "Point Break",
+                  value: 265,
+                },
+              ],
+              wait: 1000,
+            },
+          ],
+        };
+
+        // chart.clear()
         chart.setOption(option);
         return chart;
       },

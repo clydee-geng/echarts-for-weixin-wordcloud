@@ -932,6 +932,7 @@ export default (_createCanvas) => {
       var gx, gy, i;
 
       if (!canvas.getContext || settings.clearCanvas) {
+        // 内置形状
         const el = canvasObj;
         if (el.getContext) {
           var ctx = el.getContext("2d");
@@ -954,6 +955,7 @@ export default (_createCanvas) => {
           }
         }
       } else {
+        // 自定义图片
         /* Determine bgPixel by creating
              another canvas and fill the specified background color. */
         var bctx = _createCanvas().getContext("2d");

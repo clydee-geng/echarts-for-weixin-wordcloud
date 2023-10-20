@@ -5,6 +5,9 @@
   <ec-canvas canvas-id="demo2" ec="{{ demo2 }}"></ec-canvas>
 </view>
 <view style="width:100%;height: 300px;">
+  <ec-canvas canvas-id="demo4" ec="{{ demo4 }}"></ec-canvas>
+</view>
+<view style="width:100%;height: 300px;">
   <ec-canvas canvas-id="demo3" ec="{{ demo3 }}"></ec-canvas>
 </view>
 <image src="./logo.png"></image>
